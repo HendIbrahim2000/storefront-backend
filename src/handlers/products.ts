@@ -1,4 +1,5 @@
 import express, { Request, Response } from 'express'
+import { authToken } from '../middlewares/auth'
 import { Product, ProductStore } from '../models/product'
 
 const store = new ProductStore()
@@ -16,8 +17,8 @@ const show = async (req: Request, res: Response) => {
 const create = async (req: Request, res: Response) => {
     try {
         const product: Product = {
-            name: req.params.name,
-            price: parseInt(req.params.price),
+            name: req.body.name,
+            price: req.body.price,
         }
         const newProduct = await store.create(product)
         res.json(newProduct)
@@ -35,8 +36,8 @@ const destroy = async (req: Request, res: Response) => {
 const productRoutes = (app: express.Application) => {
   app.get('/products', index)
   app.get('/products/:id', show)
-  app.get('/products/:name/:price', create)
-  app.delete('/products', destroy)
+  app.post('/products', authToken, create)
+  app.delete('/products', authToken, destroy)
 }
 
 export default productRoutes

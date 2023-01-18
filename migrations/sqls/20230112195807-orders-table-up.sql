@@ -1,0 +1,1 @@
+CREATE TABLE orders (id SERIAL PRIMARY KEY, userid INTEGER, complete BOOLEAN, FOREIGN KEY (userid) REFERENCES users(id));

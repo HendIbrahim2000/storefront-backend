@@ -1,54 +1,86 @@
-# Storefront Backend Project
 
-## Getting Started
+## Installation
+`yarn` or `npm install`
 
-This repo contains a basic Node and Express app to get you started in constructing an API. To get started, clone this repo and run `yarn` in your terminal at the project root.
+## For extra installation
 
-## Required Technologies
-Your application must make use of the following libraries:
-- Postgres for the database
-- Node/Express for the application logic
-- dotenv from npm for managing environment variables
-- db-migrate from npm for migrations
-- jsonwebtoken from npm for working with JWTs
-- jasmine from npm for testing
+bcrypt: `npm i --save-dev @types/bcrypt`
+jsonwebtoken: `npm i --save-dev @types/jsonwebtoken`
+cors: `npm i --save-dev @types/cors`
 
-## Steps to Completion
+## Set up Database
+### Create Databases
+We shall create the dev and test database.
 
-### 1. Plan to Meet Requirements
+- connect to the default postgres database using psql powershel 
+- In psql it will ask for some credentials: 
+    localhost: `localhost`
+    port: `5432`
+    database: `store_app`
+    username: `store_user`
+    password: `password123`
+- or you will need to create them using following code
+    - `CREATE USER store_user WITH PASSWORD 'password123';`
+- In psql run the following to create the dev and test database
+    - `CREATE DATABASE store_app;`
+    - `CREATE DATABASE store_app_test;`
+- Connect to the databases and grant all privileges
+    - Grant for dev database
+        - `\c store_app`
+        - `GRANT ALL PRIVILEGES ON DATABASE store_app TO store_user;`
+    - Grant for test database
+        - `\c store_app`
+        - `GRANT ALL PRIVILEGES ON DATABASE store_app_test TO store_user;`
 
-In this repo there is a `REQUIREMENTS.md` document which outlines what this API needs to supply for the frontend, as well as the agreed upon data shapes to be passed between front and backend. This is much like a document you might come across in real life when building or extending an API. 
+### Migrate Database
 
-Your first task is to read the requirements and update the document with the following:
-- Determine the RESTful route for each endpoint listed. Add the RESTful route and HTTP verb to the document so that the frontend developer can begin to build their fetch requests.    
-**Example**: A SHOW route: 'blogs/:id' [GET] 
+To migrate use code below
+`db-migrate up`
 
-- Design the Postgres database tables based off the data shape requirements. Add to the requirements document the database tables and columns being sure to mark foreign keys.   
-**Example**: You can format this however you like but these types of information should be provided
-Table: Books (id:varchar, title:varchar, author:varchar, published_year:varchar, publisher_id:string[foreign key to publishers table], pages:number)
+## Enviromental Variables Set up
+Below are the environmental variables that needs to be set in a `.env` file.
 
-**NOTE** It is important to remember that there might not be a one to one ratio between data shapes and database tables. Data shapes only outline the structure of objects being passed between frontend and API, the database may need multiple tables to store a single shape. 
+POSTGRES_HOST=127.0.0.1
+POSTGRES_DB=store_app
+POSTGRES_TEST_DB= store_app_test
+POSTGRES_USER=store_user
+POSTGRES_PASSWORD=password123
+JWT_SECRET=pingopingo
+BCRYPT_PASSWORD=your-secret-password
+SALT_ROUNDS=10
+TOKEN_TEST = eyJhbGciOiJIUzI1NiJ9.MQ.Dmp0wYy90KljWQMOVMcIUb90Fr6OY5N7g8H6ta0bdlo
+ENV=dev
 
-### 2.  DB Creation and Migrations
+## Start App
+`yarn watch` or `npm run watch`
 
-Now that you have the structure of the databse outlined, it is time to create the database and migrations. Add the npm packages dotenv and db-migrate that we used in the course and setup your Postgres database. If you get stuck, you can always revisit the database lesson for a reminder. 
+### Running Ports 
+After start up, the server will start on port `3000` and the database on port `5432`
 
-You must also ensure that any sensitive information is hashed with bcrypt. If any passwords are found in plain text in your application it will not pass.
+## Database schema and columns
+In requirments.md file.
 
-### 3. Models
+## API Endpoints
+#### Products
+- Index: `'products/' [GET]`
+- Show: `'products/:id' [GET]`
+- Create [token required]: `'products/' [POST] (token)`
+- Delete: `'products/:id  [DELETE]`
 
-Create the models for each database table. The methods in each model should map to the endpoints in `REQUIREMENTS.md`. Remember that these models should all have test suites and mocks.
+#### Users
+- Index [token required]: `'users/' [GET] (token)`
+- Show [token required]: `'users/:id' [GET] (token)`
+- Create (args: User)[token required]: `'users/' [POST] (token)`
+- Delete [token required]: `'users/:id' [DELETE] (token)`
 
-### 4. Express Handlers
+#### Orders
+- Index [token required]: `'orders/:user_id' [GET] (token)`
+- Current Order by user [token required]: `'orders/current/:user_id' [GET] (token)`
+- [ADDED] Active Orders by user [token required]: `'orders/active/:user_id' [GET] (token)`
+- [ADDED] Update order's status [token required]: `'orders?status=<status>&orderId=<order id> [PUT] (token)`
+- [ADDED] Delete [token required]: `'orders/:id [DELETE] (token)`
 
-Set up the Express handlers to route incoming requests to the correct model method. Make sure that the endpoints you create match up with the enpoints listed in `REQUIREMENTS.md`. Endpoints must have tests and be CORS enabled. 
+## Testing
+Run test with 
 
-### 5. JWTs
-
-Add JWT functionality as shown in the course. Make sure that JWTs are required for the routes listed in `REQUIUREMENTS.md`.
-
-### 6. QA and `README.md`
-
-Before submitting, make sure that your project is complete with a `README.md`. Your `README.md` must include instructions for setting up and running your project including how you setup, run, and connect to your database. 
-
-Before submitting your project, spin it up and test each endpoint. If each one responds with data that matches the data shapes from the `REQUIREMENTS.md`, it is ready for submission!
+`yarn test`
